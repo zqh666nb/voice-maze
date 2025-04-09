@@ -1,0 +1,42 @@
+/* 游戏主界面样式 */
+body {
+    ？？？
+}
+
+#mainMenu {
+    ？？？
+}
+
+.menuBtn {
+    ？？？
+}
+
+.menuBtn:hover {
+    ？？？
+}
+
+#gameContainer {
+    ？？？
+}
+
+/* 说明弹窗样式 */
+#instructionsModal {
+    ？？？
+}
+
+.closeBtn {
+    ？？？
+}
+
+/* 迷宫和机器人样式 */
+#maze {
+    ？？？
+}
+
+#timer {
+    ？？？
+}
+
+#status {
+    ？？？
+}
