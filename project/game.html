@@ -3,6 +3,7 @@
 
 <head>
     <title>语音迷宫游戏</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="game.css">
 </head>
 
@@ -31,15 +32,16 @@
             <li>后退 / 下</li>
             <li>左转 / 左</li>
             <li>右转 / 右</li>
-            <li>???</li>
-            <li>停止</li>
+            <li>扫描周围 - 查看当前格子四周是否有墙、机关或物品</li>
+            <li>踩下机关 - 启动当前格子上的机关，可能打开隐藏通道或触发事件</li>
+            <li>停止 - 暂停动作或清除语音输入</li>
         </ul>
         <h3>游戏规则：</h3>
         <p>在60秒内通过语音指令控制机器人走出迷宫！</p>
         <p>每次输入一次语音后，机器人会移动一个单元格！语音输入间隔大致为0.5s！！</p>
         <p>注意避开墙壁，遇到死路可以说"后退"</p>
     </div>
-
+    <audio id="clickSound" src="click.mp3" preload="auto"></audio>
     <script src="game.js"></script>
 </body>
 
