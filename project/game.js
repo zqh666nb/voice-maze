@@ -6,6 +6,17 @@ let gameActive = false;
 let timer = 60;
 let intervalId;
 
+// 加载音效元素
+const clickSound = document.getElementById("clickSound");
+
+// 给所有按钮添加点击音效
+document.querySelectorAll(".menuBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        clickSound.currentTime = 0; // 重置播放时间
+        clickSound.play();
+    });
+});
+
 // DOM元素引用
 const elements = {
     mainMenu: document.getElementById('mainMenu'),
