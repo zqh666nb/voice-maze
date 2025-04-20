@@ -1,42 +1,120 @@
-/* 游戏主界面样式 */
+/* === 页面整体像素风样式 === */
 body {
-    ？？？
+    margin: 0;
+    padding: 0;
+    font-family: 'Press Start 2P', cursive;
+    /* 像素风格字体，建议用 Google Fonts 引入 */
+    background-image: url("background.png");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    image-rendering: pixelated;
+    /* 保证像素感 */
 }
 
+/* === 主菜单框 === */
 #mainMenu {
-    ？？？
+    text-align: center;
+        background-color: #222;
+        border: 4px solid #0ff;
+        padding: 40px;
+        width: 600px;
+        border-radius: 0;
+        /* 纯像素风，一般不使用圆角 */
+        box-shadow: 0 0 20px #0ff;
 }
 
+/* === 像素按钮样式 === */
+/* === 像素按钮样式（带点击缩放动画）=== */
 .menuBtn {
-    ？？？
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 20px;
+    font-size: 14px;
+    background-color: #333;
+    color: #0ff;
+    border: 3px solid #0ff;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: inset -4px -4px 0 #000, inset 4px 4px 0 #0ff;
+    transition: transform 0.1s ease, background-color 0.2s ease;
 }
 
+/* 鼠标悬浮变亮 */
 .menuBtn:hover {
-    ？？？
+    background-color: #0ff;
+    color: #000;
+    transform: scale(1.05);
 }
 
+/* 鼠标点击时缩小按钮模拟按压感 */
+.menuBtn:active {
+    transform: scale(0.95);
+}
+
+/* === 游戏界面容器 === */
 #gameContainer {
-    ？？？
+    display: none;
+    background-color: #111;
+    padding: 20px;
+    border: 4px solid #ff0;
+    box-shadow: 0 0 10px #ff0;
+    text-align: center;
 }
 
-/* 说明弹窗样式 */
-#instructionsModal {
-    ？？？
-}
-
-.closeBtn {
-    ？？？
-}
-
-/* 迷宫和机器人样式 */
-#maze {
-    ？？？
-}
-
+/* === 计时器文本 === */
 #timer {
-    ？？？
+    font-size: 12px;
+    color: #ff0;
+    margin-bottom: 10px;
 }
 
+/* === 状态提示文本 === */
 #status {
-    ？？？
+    margin-top: 10px;
+    font-size: 12px;
+    color: #0f0;
+}
+
+/* === 迷宫 Canvas 样式（白底像素迷宫） === */
+#maze {
+    background-color: #fff;
+    image-rendering: pixelated;
+    border: 4px solid #ff0;
+    margin-top: 10px;
+}
+
+/* === 游戏说明弹窗 === */
+#instructionsModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    transform: translate(-50%, -50%);
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    border: 4px solid #f0f;
+    box-shadow: 0 0 15px #f0f;
+    font-size: 12px;
+}
+
+/* === 关闭按钮样式 === */
+.closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    color: #f0f;
+    cursor: pointer;
+}
+
+.closeBtn:hover {
+    color: #fff;
 }
