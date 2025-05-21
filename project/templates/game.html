@@ -4,7 +4,8 @@
 <head>
     <title>语音迷宫游戏</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="game.css">
+    <!-- Flask模板语法：引用静态CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
 </head>
 
 <body>
@@ -41,8 +42,12 @@
         <p>每次输入一次语音后，机器人会移动一个单元格！语音输入间隔大致为0.5s！！</p>
         <p>注意避开墙壁，遇到死路可以说"后退"</p>
     </div>
-    <audio id="clickSound" src="click.mp3" preload="auto"></audio>
-    <script src="game.js"></script>
+
+    <!-- Flask模板语法：引用音效 -->
+    <audio id="clickSound" src="{{ url_for('static', filename='click.mp3') }}" preload="auto"></audio>
+    
+    <!-- Flask模板语法：引用JS -->
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -12,11 +12,11 @@ VALID_COMMANDS = {
     '左转': 'left',
     '右转': 'right',
     '停止': 'stop',
-    '': 'up',
-    '': 'down',
-    '': 'left',
-    '': 'right',
 }
+
+@app.route('/')
+def index():
+    return render_template('game.html')
 
 @app.route('/command', methods=['POST'])
 def handle_command():
