@@ -62,28 +62,59 @@ function initGame() {
 }
 
 function initMaze() {
-    /*const ctx = elements.maze.getContext('2d');
-    const mazeLayout = [
-        [0, 1, 0, 0, 0, 1, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
-        [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-        [1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
-        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 1, 1, 0]
+    const ctx = elements.maze.getContext('2d');
+    const rows = 21; // 奇数行数
+    const cols = 21; // 奇数列数
+    const cellSize = 20; // 每格像素
+    elements.maze.width = cols * cellSize;
+    elements.maze.height = rows * cellSize;
+
+    // 初始化迷宫数组（全部设为墙 1）
+    const maze = Array.from({ length: rows }, () => Array(cols).fill(1));
+
+    // 方向：上右下左
+    const directions = [
+        [0, -2], [2, 0], [0, 2], [-2, 0]
     ];
 
-    for (let i = 0; i < 10; i++) {
-        for (let j = 0; j < 10; j++) {
-            ctx.fillStyle = mazeLayout[i][j] ? 'black' : 'white';
-            ctx.fillRect(j * gridSize, i * gridSize, gridSize, gridSize);
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     }
-    robotPos = { x: 0, y: 0 };*/
+
+    function carve(x, y) {
+        maze[y][x] = 0;
+        shuffle(directions);
+        for (const [dx, dy] of directions) {
+            const nx = x + dx, ny = y + dy;
+            if (ny > 0 && ny < rows - 1 && nx > 0 && nx < cols - 1 && maze[ny][nx] === 1) {
+                maze[y + dy / 2][x + dx / 2] = 0; // 打通中间墙
+                carve(nx, ny); // 递归
+            }
+        }
+    }
+
+    // 从 (1,1) 开始生成路径
+    carve(1, 1);
+
+    // 设置入口和出口
+    maze[0][1] = 0; // 入口
+    maze[rows - 1][cols - 2] = 0; // 出口
+
+    // 绘制迷宫
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            ctx.fillStyle = maze[i][j] ? '#8B4513' : 'black';
+            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+        }
+    }
+
+    // 设定机器人初始位置在入口（左上）
+    robotPos = { x: 1, y: 0 };
 }
+
 
 // 语音控制功能
 function startVoiceControl() {

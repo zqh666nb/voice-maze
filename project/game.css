@@ -83,7 +83,7 @@ body {
 
 /* === 迷宫 Canvas 样式（白底像素迷宫） === */
 #maze {
-    background-color: #fff;
+    background-color: #000000;
     image-rendering: pixelated;
     border: 4px solid #ff0;
     margin-top: 10px;
