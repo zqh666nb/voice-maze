@@ -128,7 +128,7 @@ function initMaze() {
 
 // 语音控制功能
 function startVoiceControl() {
-    /*const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
      recognition.lang = 'zh-CN';
      recognition.continuous = true;
  
@@ -148,7 +148,7 @@ function startVoiceControl() {
          }
      };
  
-     recognition.start();*/
+     recognition.start();
 }
 
 // 计时器控制
