@@ -128,27 +128,32 @@ function initMaze() {
 
 // 语音控制功能
 function startVoiceControl() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-     recognition.lang = 'zh-CN';
-     recognition.continuous = true;
- 
-     recognition.onresult = async (event) => {
-         const command = event.results[event.results.length - 1][0].transcript;
-         elements.status.textContent = `识别到指令: ${command}`;
- 
-         const response = await fetch('/command', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ command })
-         });
- 
-         const result = await response.json();
-         if (result.success) {
-             moveRobot(result.direction);
-         }
-     };
- 
-     recognition.start();
+    setInterval(() => {
+        fetch('/status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.command) {
+                    console.log("从后端获取到指令：", data.command);
+                    elements.status.textContent = "识别到：" + data.command;
+
+                    const mapping = {
+                        '上': 'up', '下': 'down', '左': 'left', '右': 'right',
+                        '前进': 'up', '后退': 'down', '左转': 'left', '右转': 'right',
+                        '停止': 'stop'
+                    };
+
+                    for (const key in mapping) {
+                        if (data.command.includes(key)) {
+                            moveRobot(mapping[key]);  // 调用你已有的移动函数
+                            break;
+                        }
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("获取语音识别指令失败：", err);
+            });
+    }, 1000); // 每秒检查一次
 }
 
 // 计时器控制
