@@ -52,6 +52,13 @@ function showInstructions() {
 function closeInstructions() {
     elements.instructionsModal.style.display = 'none';
 }
+function drawRobot(ctx, x, y, cellSize) { // 绘制机器人
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, cellSize / 2.5, 0, Math.PI * 2);
+    ctx.fill();
+}
+
 
 // 游戏核心逻辑
 function initGame() {
@@ -113,6 +120,9 @@ function initMaze() {
 
     // 设定机器人初始位置在入口（左上）
     robotPos = { x: 1, y: 0 };
+
+    // 绘制机器人
+    drawRobot(ctx, robotPos.x, robotPos.y, cellSize);
 }
 
 
