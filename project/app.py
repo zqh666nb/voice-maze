@@ -4,11 +4,13 @@ import queue
 from vosk import Model, KaldiRecognizer
 import sounddevice as sd
 import json
+import os
 
 app = Flask(__name__)
 
 # 初始化语音模型路径（注意修改为你本地模型路径）
-model = Model("vosk-model-small-cn-0.22")  # 确保路径正确
+model_path = os.path.join(os.path.dirname(__file__), "vosk-model-small-cn-0.22")
+model = Model(model_path)
 samplerate = 16000
 q = queue.Queue()
 latest_command = ""  # 全局变量，保存最新语音识别结果

@@ -19,6 +19,7 @@
     <!-- 游戏容器 -->
     <div id="gameContainer">
         <div id="timer">剩余时间: ??? 秒</div>
+        <div id="voiceOutput" style="margin-bottom:10px;color:#2196F3;font-weight:bold;"></div>
         <canvas id="maze" width="???" height="???"></canvas>
         <div id="status">等待指令中...</div>
     </div>
@@ -45,7 +46,7 @@
 
     <!-- Flask模板语法：引用音效 -->
     <audio id="clickSound" src="{{ url_for('static', filename='click.mp3') }}" preload="auto"></audio>
-    
+
     <!-- Flask模板语法：引用JS -->
     <script src="{{ url_for('static', filename='game.js') }}"></script>
 </body>

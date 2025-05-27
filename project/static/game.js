@@ -3,8 +3,9 @@ const mazeSize = 400;
 const gridSize = 20;
 let robotPos = { x: 0, y: 0 };
 let gameActive = false;
-let timer = 60;
+let timer = 120;
 let intervalId;
+let mazeArr; // 新增全局变量保存迷宫
 
 // 加载音效元素
 const clickSound = document.getElementById("clickSound");
@@ -27,7 +28,8 @@ const elements = {
     status: document.getElementById('status'),
     startGameBtn: document.getElementById('startGameBtn'),
     instructionsBtn: document.getElementById('instructionsBtn'),
-    closeBtn: document.querySelector('.closeBtn')
+    closeBtn: document.querySelector('.closeBtn'),
+    voiceOutput: document.getElementById('voiceOutput')
 };
 
 // 事件监听器
@@ -52,13 +54,13 @@ function showInstructions() {
 function closeInstructions() {
     elements.instructionsModal.style.display = 'none';
 }
+
 function drawRobot(ctx, x, y, cellSize) { // 绘制机器人
     ctx.fillStyle = 'yellow';
     ctx.beginPath();
     ctx.arc(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, cellSize / 2.5, 0, Math.PI * 2);
     ctx.fill();
 }
-
 
 // 游戏核心逻辑
 function initGame() {
@@ -110,6 +112,8 @@ function initMaze() {
     maze[0][1] = 0; // 入口
     maze[rows - 1][cols - 2] = 0; // 出口
 
+    mazeArr = maze; // 保存到全局变量
+
     // 绘制迷宫
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
@@ -125,26 +129,55 @@ function initMaze() {
     drawRobot(ctx, robotPos.x, robotPos.y, cellSize);
 }
 
+// 常见方向字及其常见误识别字的拼音映射
+const directionPinyinMap = {
+    'up': ['上', '尚', '伤', 'shang'],
+    'down': ['下', '夏', '吓', 'xia'],
+    'left': ['左', '作', '佐', 'zuo'],
+    'right': ['右', '友', '有', 'yo', 'you']
+};
 
-// 语音控制功能
+function getDirectionByApproximate(text) {
+    for (const dir in directionPinyinMap) {
+        for (const word of directionPinyinMap[dir]) {
+            if (text.includes(word)) {
+                console.log('【调试】近似比对命中：', word, '=>', dir);
+                return dir;
+            }
+        }
+    }
+    return null;
+}
+
 function startVoiceControl() {
+    const voiceOutput = document.getElementById('voiceOutput');
     setInterval(() => {
         fetch('/status')
             .then(res => res.json())
             .then(data => {
                 if (data.command) {
-                    console.log("从后端获取到指令：", data.command);
+                    console.log('【调试】收到后端指令：', data.command);
+                    voiceOutput.textContent = "语音内容：" + data.command;
                     elements.status.textContent = "识别到：" + data.command;
 
+                    // 近似比对优先
+                    let dir = getDirectionByApproximate(data.command);
+                    console.log('【调试】近似比对方向：', dir);
+                    if (dir) {
+                        moveRobot(dir);
+                        return;
+                    }
+
+                    // 原有严格匹配
                     const mapping = {
                         '上': 'up', '下': 'down', '左': 'left', '右': 'right',
                         '前进': 'up', '后退': 'down', '左转': 'left', '右转': 'right',
                         '停止': 'stop'
                     };
-
                     for (const key in mapping) {
                         if (data.command.includes(key)) {
-                            moveRobot(mapping[key]);  // 调用你已有的移动函数
+                            console.log('【调试】严格匹配到方向：', key, '=>', mapping[key]);
+                            moveRobot(mapping[key]);
                             break;
                         }
                     }
@@ -153,12 +186,12 @@ function startVoiceControl() {
             .catch(err => {
                 console.error("获取语音识别指令失败：", err);
             });
-    }, 1000); // 每秒检查一次
+    }, 1000);
 }
 
 // 计时器控制
 function resetTimer() {
-    timer = 60;
+    timer = 120;
     elements.timer.textContent = `剩余时间: ${timer} 秒`;
 }
 
@@ -178,35 +211,53 @@ function gameOver() {
 
 // 机器人移动逻辑
 function moveRobot(direction) {
-    /*const step = 20;
-    const newPos = calculateNewPosition(robotPos, direction);
-
-    if (isValidMove(newPos)) {
-        robotPos = newPos;
+    console.log('【调试】moveRobot被调用，方向：', direction);
+    const cellSize = 20;
+    let { x, y } = robotPos;
+    let nx = x, ny = y;
+    switch (direction) {
+        case 'up': ny -= 1; break;
+        case 'down': ny += 1; break;
+        case 'left': nx -= 1; break;
+        case 'right': nx += 1; break;
+        default:
+            console.log('【调试】未知方向，忽略');
+            return;
+    }
+    // 判断是否越界和是否为通路
+    if (
+        ny >= 0 && ny < mazeArr.length &&
+        nx >= 0 && nx < mazeArr[0].length &&
+        mazeArr[ny][nx] === 0
+    ) {
+        console.log('【调试】移动前位置：', robotPos, '移动后位置：', { x: nx, y: ny });
+        robotPos = { x: nx, y: ny };
         updateRobotPosition();
         checkWinCondition();
-    }*/
-}
-
-function calculateNewPosition(current, dir) {
-    switch (dir) {
-        case 'up': return { ...current, y: current.y - step };
-        case 'down': return { ...current, y: current.y + step };
-        case 'left': return { ...current, x: current.x - step };
-        case 'right': return { ...current, x: current.x + step };
-        default: return current;
+    } else {
+        console.log('【调试】目标位置不可达或越界：', { x: nx, y: ny });
     }
 }
 
-function isValidMove(position) {
-    // 实现碰撞检测逻辑
-    return true;
-}
-
 function updateRobotPosition() {
-    // 实现机器人位置更新
+    const ctx = elements.maze.getContext('2d');
+    const cellSize = 20;
+    // 先重绘迷宫
+    for (let i = 0; i < mazeArr.length; i++) {
+        for (let j = 0; j < mazeArr[0].length; j++) {
+            ctx.fillStyle = mazeArr[i][j] ? '#8B4513' : 'black';
+            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+        }
+    }
+    // 再画机器人
+    drawRobot(ctx, robotPos.x, robotPos.y, cellSize);
 }
 
 function checkWinCondition() {
-    // 实现胜利条件检测
+    // 判断是否到达出口
+    if (robotPos.y === mazeArr.length - 1 && robotPos.x === mazeArr[0].length - 2) {
+        clearInterval(intervalId);
+        alert('恭喜你走出迷宫！');
+        location.reload();
+    }
 }
