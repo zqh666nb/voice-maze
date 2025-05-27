@@ -132,21 +132,25 @@ function initMaze() {
 // 常见方向字及其常见误识别字的拼音映射
 const directionPinyinMap = {
     'up': ['上', '尚', '伤', 'shang'],
-    'down': ['下', '夏', '吓', 'xia'],
-    'left': ['左', '作', '佐', 'zuo'],
-    'right': ['右', '友', '有', 'yo', 'you']
+    'down': ['下', '夏', '吓','侠', 'xia'],
+    'left': ['左', '作', '佐','做','坐','zuo'],
+    'right': ['右', '友', '有','又','由', 'yo', 'you']
 };
 
-function getDirectionByApproximate(text) {
-    for (const dir in directionPinyinMap) {
-        for (const word of directionPinyinMap[dir]) {
-            if (text.includes(word)) {
-                console.log('【调试】近似比对命中：', word, '=>', dir);
-                return dir;
+function getDirectionsByApproximate(text) {
+    // 返回所有命中的方向（顺序与出现顺序一致）
+    let directions = [];
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        for (const dir in directionPinyinMap) {
+            if (directionPinyinMap[dir].includes(char)) {
+                directions.push(dir);
+                console.log('【调试】近似比对命中：', char, '=>', dir);
+                break;
             }
         }
     }
-    return null;
+    return directions;
 }
 
 function startVoiceControl() {
@@ -160,16 +164,16 @@ function startVoiceControl() {
                     voiceOutput.textContent = "语音内容：" + data.command;
                     elements.status.textContent = "识别到：" + data.command;
 
-                    // 近似比对优先
-                    let dir = getDirectionByApproximate(data.command);
-                    console.log('【调试】近似比对方向：', dir);
-                    if (dir) {
+                    // 近似比对优先，逐字符执行
+                    let dirs = getDirectionsByApproximate(data.command);
+                    console.log('【调试】近似比对方向序列：', dirs);
+                    for (const dir of dirs) {
                         moveRobot(dir);
-                        return;
                     }
+                    if (dirs.length > 0) return;
 
                     // 原有严格匹配
-                    const mapping = {
+                    ```const mapping = {
                         '上': 'up', '下': 'down', '左': 'left', '右': 'right',
                         '前进': 'up', '后退': 'down', '左转': 'left', '右转': 'right',
                         '停止': 'stop'
@@ -180,7 +184,7 @@ function startVoiceControl() {
                             moveRobot(mapping[key]);
                             break;
                         }
-                    }
+                    }```
                 }
             })
             .catch(err => {
