@@ -19,13 +19,13 @@ body {
 /* === 主菜单框 === */
 #mainMenu {
     text-align: center;
-        background-color: #222;
-        border: 4px solid #0ff;
-        padding: 40px;
-        width: 600px;
-        border-radius: 0;
-        /* 纯像素风，一般不使用圆角 */
-        box-shadow: 0 0 20px #0ff;
+    background-color: #222;
+    border: 4px solid #0ff;
+    padding: 40px;
+    width: 600px;
+    border-radius: 0;
+    /* 纯像素风，一般不使用圆角 */
+    box-shadow: 0 0 20px #0ff;
 }
 
 /* === 像素按钮样式 === */
@@ -117,4 +117,59 @@ body {
 
 .closeBtn:hover {
     color: #fff;
+}
+
+/* === 全局弹窗像素风格 === */
+#globalModal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+#globalModal>div {
+    background: #222;
+    color: #0ff;
+    border: 4px solid #0ff;
+    box-shadow: 0 0 24px #0ff, 0 0 0 8px #111;
+    border-radius: 0;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 20px;
+    min-width: 300px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#globalModalMsg {
+    color: #0ff;
+    margin-bottom: 24px;
+    word-break: break-all;
+    text-shadow: 0 2px 0 #000, 0 0 8px #0ff;
+}
+
+#globalModal button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 18px;
+    padding: 12px 32px;
+    background: #111;
+    color: #0ff;
+    border: 3px solid #0ff;
+    border-radius: 0;
+    cursor: pointer;
+    box-shadow: inset -4px -4px 0 #000, inset 4px 4px 0 #0ff;
+    transition: background 0.2s, color 0.2s;
+}
+
+#globalModal button:hover {
+    background: #0ff;
+    color: #111;
 }

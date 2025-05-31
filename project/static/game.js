@@ -132,10 +132,55 @@ function initMaze() {
 // 常见方向字及其常见误识别字的拼音映射
 const directionPinyinMap = {
     'up': ['上', '尚', '伤', 'shang'],
-    'down': ['下', '夏', '吓','侠', 'xia'],
-    'left': ['左', '作', '佐','做','坐','zuo'],
-    'right': ['右', '友', '有','又','由', 'yo', 'you']
+    'down': ['下', '夏', '吓', '侠', 'xia'],
+    'left': ['左', '作', '佐', '做', '坐', 'zuo', '佐', '着', '走'],
+    'right': ['右', '友', '有', '又', '由', 'yo', 'you','悠','呦'],
 };
+
+// 新增：快捷命令映射
+const quickMoveMap = {
+    'down till end': ['下底', '夏地', '下头', '下墙', '效劳'],
+    'up till end': ['上底', '上地', '上头', '上墙']
+};
+
+// 检查是否为快捷命令
+function getQuickMoveDirection(text) {
+    for (const dir in quickMoveMap) {
+        for (const phrase of quickMoveMap[dir]) {
+            if (text.includes(phrase)) {
+                return dir;
+            }
+        }
+    }
+    return null;
+}
+
+// 新增：一直移动到障碍
+function moveRobotToWall(direction) {
+    let moved = false;
+    while (true) {
+        const { x, y } = robotPos;
+        let nx = x, ny = y;
+        switch (direction) {
+            case 'up till end': ny -= 1; break;
+            case 'down till end': ny += 1; break;
+        }
+        if (
+            ny >= 0 && ny < mazeArr.length &&
+            nx >= 0 && nx < mazeArr[0].length &&
+            mazeArr[ny][nx] === 0
+        ) {
+            robotPos = { x: nx, y: ny };
+            moved = true;
+        } else {
+            break;
+        }
+    }
+    if (moved) {
+        updateRobotPosition();
+        checkWinCondition();
+    }
+}
 
 function getDirectionsByApproximate(text) {
     // 返回所有命中的方向（顺序与出现顺序一致）
@@ -145,7 +190,6 @@ function getDirectionsByApproximate(text) {
         for (const dir in directionPinyinMap) {
             if (directionPinyinMap[dir].includes(char)) {
                 directions.push(dir);
-                console.log('【调试】近似比对命中：', char, '=>', dir);
                 break;
             }
         }
@@ -160,31 +204,25 @@ function startVoiceControl() {
             .then(res => res.json())
             .then(data => {
                 if (data.command) {
-                    console.log('【调试】收到后端指令：', data.command);
+
                     voiceOutput.textContent = "语音内容：" + data.command;
                     elements.status.textContent = "识别到：" + data.command;
 
+                    // 新增：检测快捷命令
+                    let quickDir = getQuickMoveDirection(data.command);
+                    if (quickDir) {
+                        moveRobotToWall(quickDir);
+                        return;
+                    }
+
                     // 近似比对优先，逐字符执行
                     let dirs = getDirectionsByApproximate(data.command);
-                    console.log('【调试】近似比对方向序列：', dirs);
+
                     for (const dir of dirs) {
                         moveRobot(dir);
                     }
                     if (dirs.length > 0) return;
 
-                    // 原有严格匹配
-                    ```const mapping = {
-                        '上': 'up', '下': 'down', '左': 'left', '右': 'right',
-                        '前进': 'up', '后退': 'down', '左转': 'left', '右转': 'right',
-                        '停止': 'stop'
-                    };
-                    for (const key in mapping) {
-                        if (data.command.includes(key)) {
-                            console.log('【调试】严格匹配到方向：', key, '=>', mapping[key]);
-                            moveRobot(mapping[key]);
-                            break;
-                        }
-                    }```
                 }
             })
             .catch(err => {
@@ -207,15 +245,21 @@ function startTimer() {
     }, 1000);
 }
 
+// 全局弹窗显示函数
+function showGlobalModal(msg) {
+    const modal = document.getElementById('globalModal');
+    const msgSpan = document.getElementById('globalModalMsg');
+    msgSpan.textContent = msg;
+    modal.style.display = 'flex';
+}
+
 function gameOver() {
     clearInterval(intervalId);
-    alert('时间到！游戏结束');
-    location.reload();
+    showGlobalModal('时间到！游戏结束');
 }
 
 // 机器人移动逻辑
 function moveRobot(direction) {
-    console.log('【调试】moveRobot被调用，方向：', direction);
     const cellSize = 20;
     let { x, y } = robotPos;
     let nx = x, ny = y;
@@ -261,7 +305,6 @@ function checkWinCondition() {
     // 判断是否到达出口
     if (robotPos.y === mazeArr.length - 1 && robotPos.x === mazeArr[0].length - 2) {
         clearInterval(intervalId);
-        alert('恭喜你走出迷宫！');
-        location.reload();
+        showGlobalModal('恭喜你走出迷宫！');
     }
 }
