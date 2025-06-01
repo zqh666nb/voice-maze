@@ -134,7 +134,7 @@ const directionPinyinMap = {
     'up': ['上', '尚', '伤', 'shang'],
     'down': ['下', '夏', '吓', '侠', 'xia'],
     'left': ['左', '作', '佐', '做', '坐', 'zuo', '佐', '着', '走'],
-    'right': ['右', '友', '有', '又', '由', 'yo', 'you','悠','呦'],
+    'right': ['右', '友', '有', '又', '由', 'yo', 'you', '悠', '呦'],
 };
 
 // 新增：快捷命令映射
@@ -307,4 +307,26 @@ function checkWinCondition() {
         clearInterval(intervalId);
         showGlobalModal('恭喜你走出迷宫！');
     }
+}
+
+// 录音并上传到 /recognize
+let mediaRecorder, audioChunks = [];
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'record.wav');
+            fetch('/recognize', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('识别结果：', data.text);
+                });
+        };
+        setTimeout(() => mediaRecorder.stop(), 2000); // 录2秒
+    });
 }

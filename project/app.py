@@ -1,10 +1,11 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import threading
 import queue
 from vosk import Model, KaldiRecognizer
 import sounddevice as sd
 import json
 import os
+import wave
 
 app = Flask(__name__)
 
@@ -52,6 +53,20 @@ def status():
 @app.route('/favicon.ico')
 def favicon():
     return "", 204
+
+@app.route('/recognize', methods=['POST'])
+def recognize():
+    audio = request.files['audio']
+    wf = wave.open(audio, 'rb')
+    rec = KaldiRecognizer(model, wf.getframerate())
+    while True:
+        data = wf.readframes(4000)
+        if len(data) == 0:
+            break
+        rec.AcceptWaveform(data)
+    result = rec.FinalResult()
+    text = json.loads(result).get('text', '')
+    return jsonify({'text': text})
 
 if __name__ == '__main__':
     # 启动后台线程
